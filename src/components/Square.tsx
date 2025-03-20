@@ -7,23 +7,23 @@ interface SquareProps {
 }
 
 const Square: React.FC<SquareProps> = ({ value, onClick, isWinningSquare }) => {
-  const baseClasses = "w-full h-20 text-4xl font-bold flex items-center justify-center rounded-md transition-all duration-200";
+  const baseClasses = "w-full h-20 text-4xl font-bold flex items-center justify-center rounded-md transition transform duration-300";
   
   // Different styling based on value and winning status
   const getSquareClasses = () => {
     if (isWinningSquare) {
-      return `${baseClasses} bg-green-200 text-green-800 border-2 border-green-500`;
+      return `${baseClasses} bg-gradient-to-r from-green-300 to-green-500 text-white border-2 border-green-700 shadow-lg scale-105`;
     }
     
     if (!value) {
-      return `${baseClasses} bg-gray-100 hover:bg-gray-200 cursor-pointer`;
+      return `${baseClasses} bg-gray-100 hover:bg-gray-200 cursor-pointer shadow-md hover:shadow-lg`;
     }
     
     if (value === 'X') {
-      return `${baseClasses} bg-indigo-100 text-indigo-600`;
+      return `${baseClasses} bg-gradient-to-br from-indigo-300 to-blue-300 text-indigo-800 shadow-md hover:shadow-xl`;
     }
     
-    return `${baseClasses} bg-purple-100 text-purple-600`;
+    return `${baseClasses} bg-gradient-to-br from-purple-300 to-pink-300 text-purple-800 shadow-md hover:shadow-xl`;
   };
 
   return (

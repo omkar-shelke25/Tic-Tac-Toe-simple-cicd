@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import { Trophy, User, Users } from 'lucide-react';
 
 interface ScoreBoardProps {
@@ -9,40 +10,103 @@ interface ScoreBoardProps {
   };
 }
 
+const Container = styled.div`
+  background: #F1F5F9;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  &:hover {
+    transform: scale(1.02);
+  }
+`;
+
+const Title = styled.h2`
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+`;
+
+const ScoreList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+interface ScoreItemProps {
+  bgColor: string;
+}
+
+const ScoreItem = styled.div<ScoreItemProps>`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: ${(props) => props.bgColor};
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  &:hover {
+    transform: translateY(-3px);
+  }
+`;
+
+const Label = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+`;
+
+interface ScoreValueProps {
+  color: string;
+}
+
+const ScoreValue = styled.span<ScoreValueProps>`
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: ${(props) => props.color};
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+`;
+
 const ScoreBoard: React.FC<ScoreBoardProps> = ({ scores }) => {
   return (
-    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-      <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-        <Trophy className="h-5 w-5 text-yellow-500" />
+    <Container>
+      <Title>
+        <Trophy size={24} style={{ color: "#F59E0B" }} />
         Score Board
-      </h2>
-      
-      <div className="space-y-2">
-        <div className="flex justify-between items-center p-2 bg-indigo-50 rounded">
-          <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-indigo-600" />
-            <span className="font-medium">Pushpa Raj</span>
-          </div>
-          <span className="text-lg font-bold text-indigo-600">{scores.X}</span>
-        </div>
-        
-        <div className="flex justify-between items-center p-2 bg-purple-50 rounded">
-          <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-purple-600" />
-            <span className="font-medium">Appanna</span>
-          </div>
-          <span className="text-lg font-bold text-purple-600">{scores.O}</span>
-        </div>
-        
-        <div className="flex justify-between items-center p-2 bg-gray-100 rounded">
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-gray-600" />
-            <span className="font-medium">Draws</span>
-          </div>
-          <span className="text-lg font-bold text-gray-600">{scores.draws}</span>
-        </div>
-      </div>
-    </div>
+      </Title>
+      <ScoreList>
+        <ScoreItem bgColor="#1E3A8A">
+          <Label>
+            <User size={20} style={{ color: "#BFDBFE" }} />
+            <span style={{ color: "#BFDBFE" }}>Pushpa Raj</span>
+          </Label>
+          <ScoreValue color="#BFDBFE">{scores.X}</ScoreValue>
+        </ScoreItem>
+        <ScoreItem bgColor="#4C1D95">
+          <Label>
+            <User size={20} style={{ color: "#DDD6FE" }} />
+            <span style={{ color: "#DDD6FE" }}>Appanna</span>
+          </Label>
+          <ScoreValue color="#DDD6FE">{scores.O}</ScoreValue>
+        </ScoreItem>
+        <ScoreItem bgColor="#1F2937">
+          <Label>
+            <Users size={20} style={{ color: "#E5E7EB" }} />
+            <span style={{ color: "#E5E7EB" }}>Draws</span>
+          </Label>
+          <ScoreValue color="#E5E7EB">{scores.draws}</ScoreValue>
+        </ScoreItem>
+      </ScoreList>
+    </Container>
   );
 };
 

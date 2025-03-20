@@ -1,9 +1,203 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Award } from 'lucide-react';
+import styled, { keyframes, createGlobalStyle } from 'styled-components';
+import { RefreshCw, Award, XCircle, Trophy, Frown, PlayCircle, Star, Smile } from 'lucide-react';
 import Board from './components/Board';
 import ScoreBoard from './components/ScoreBoard';
 import GameHistory from './components/GameHistory';
 import { calculateWinner, checkDraw } from './utils/gameLogic';
+
+// Global Style to import the gaming font
+const GlobalStyle = createGlobalStyle`
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+`;
+
+const AppContainer = styled.div`
+  min-height: 100vh;
+  background: linear-gradient(135deg, #c3cfe2, #f6d365, #fda085);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+`;
+
+const Card = styled.div`
+  max-width: 1024px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+`;
+
+const Content = styled.div`
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 2fr 1fr;
+  }
+`;
+
+const GameSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const ButtonsContainer = styled.div`
+  margin-top: 24px;
+  display: flex;
+  gap: 16px;
+`;
+
+const Button = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+`;
+
+const NewGameButton = styled(Button)`
+  background: #667eea;
+  color: #fff;
+  &:hover {
+    background: #5a67d8;
+  }
+`;
+
+const ResetStatsButton = styled(Button)`
+  background: #e2e8f0;
+  color: #4a5568;
+  &:hover {
+    background: #cbd5e0;
+  }
+`;
+
+const StatsSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+`;
+
+// =====================
+// Header Component
+// =====================
+
+// Animation for decorative icons
+const bounce = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+`;
+
+// Styled Header container with a vibrant gaming-inspired gradient background
+const Header = styled.header`
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  padding: 24px;
+  text-align: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+`;
+
+// Styled Title using the gaming font
+const Title = styled.h1`
+  font-size: 2.5rem;
+  font-weight: bold;
+  font-family: 'Press Start 2P', cursive;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+`;
+
+// Styled Subtitle using the gaming font
+const Subtitle = styled.p`
+  font-size: 1.25rem;
+  margin-top: 12px;
+  color: #ffe4e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Press Start 2P', cursive;
+`;
+
+// Animated decorative icons for a playful touch
+const DecorativeStar = styled(Star)`
+  animation: ${bounce} 2s infinite;
+`;
+
+const DecorativeSmile = styled(Smile)`
+  animation: ${bounce} 2s infinite;
+  animation-delay: 0.5s;
+`;
+
+const HeaderComponent: React.FC = () => (
+  <Header>
+    <Title>
+      <Award size={32} />
+      Tic Tac Toe
+      <DecorativeStar size={28} color="#FFD700" />
+    </Title>
+    <Subtitle>
+      A classic game reimagined
+      <DecorativeSmile size={24} color="#FFD700" />
+    </Subtitle>
+  </Header>
+);
+
+// =====================
+// Status Message Component
+// =====================
+
+const StatusMessage = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.5rem;
+  color: #4c51bf;
+  font-weight: 600;
+  margin-bottom: 16px;
+`;
+
+const renderStatusMessage = (gameStatus: 'playing' | 'won' | 'draw', xIsNext: boolean) => {
+  if (gameStatus === 'won') {
+    const winner = !xIsNext ? 'X' : 'O';
+    return (
+      <StatusMessage>
+        <Trophy size={24} color="#FFC107" />
+        <span>Player {winner} wins!</span>
+      </StatusMessage>
+    );
+  } else if (gameStatus === 'draw') {
+    return (
+      <StatusMessage>
+        <Frown size={24} color="#E53935" />
+        <span>It's a draw!</span>
+      </StatusMessage>
+    );
+  } else {
+    return (
+      <StatusMessage>
+        <PlayCircle size={24} color="#43A047" />
+        <span>Next player: {xIsNext ? 'X' : 'O'}</span>
+      </StatusMessage>
+    );
+  }
+};
+
+// =====================
+// App Component
+// =====================
 
 function App() {
   // Game state
@@ -21,34 +215,25 @@ function App() {
   // Check for winner or draw
   useEffect(() => {
     const result = calculateWinner(board);
-    
     if (result) {
       setGameStatus('won');
       setWinningLine(result.line);
-      
-      // Update scores
       setScores(prevScores => ({
         ...prevScores,
         [result.winner]: prevScores[result.winner as keyof typeof prevScores] + 1
       }));
-      
-      // Add to history
       setGameHistory(prev => [
-        ...prev, 
+        ...prev,
         { winner: result.winner, board: [...board], date: new Date() }
       ]);
     } else if (checkDraw(board)) {
       setGameStatus('draw');
-      
-      // Update draw count
       setScores(prevScores => ({
         ...prevScores,
         draws: prevScores.draws + 1
       }));
-      
-      // Add to history
       setGameHistory(prev => [
-        ...prev, 
+        ...prev,
         { winner: null, board: [...board], date: new Date() }
       ]);
     }
@@ -56,12 +241,9 @@ function App() {
 
   // Handle square click
   const handleClick = (index: number) => {
-    // Return if square is filled or game is over
     if (board[index] || gameStatus !== 'playing') return;
-    
     const newBoard = [...board];
     newBoard[index] = xIsNext ? 'X' : 'O';
-    
     setBoard(newBoard);
     setXIsNext(!xIsNext);
   };
@@ -81,67 +263,41 @@ function App() {
     setGameHistory([]);
   };
 
-  // Get current game status message
-  const getStatusMessage = () => {
-    if (gameStatus === 'won') {
-      const winner = !xIsNext ? 'X' : 'O';
-      return `Player ${winner} wins!`;
-    } else if (gameStatus === 'draw') {
-      return "It's a draw!";
-    } else {
-      return `Next player: ${xIsNext ? 'X' : 'O'}`;
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 flex flex-col items-center justify-center p-4">
-      <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="p-6 bg-indigo-600 text-white text-center">
-          <h1 className="text-3xl font-bold flex items-center justify-center gap-2">
-            <Award className="h-8 w-8" />
-            Tic Tac Toe
-          </h1>
-          <p className="text-indigo-200 mt-1">A classic game reimagined</p>
-        </div>
-        
-        <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Game section */}
-          <div className="md:col-span-2 flex flex-col items-center">
-            <div className="mb-4 text-center">
-              <h2 className="text-xl font-semibold text-indigo-800">{getStatusMessage()}</h2>
-            </div>
-            
-            <Board 
-              squares={board} 
-              onClick={handleClick} 
-              winningLine={winningLine}
-            />
-            
-            <div className="mt-6 flex gap-4">
-              <button 
-                onClick={resetGame}
-                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition-colors"
-              >
-                <RefreshCw className="h-4 w-4" />
-                New Game
-              </button>
-              <button 
-                onClick={resetStats}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-lg transition-colors"
-              >
-                Reset All
-              </button>
-            </div>
-          </div>
-          
-          {/* Stats section */}
-          <div className="flex flex-col gap-6">
-            <ScoreBoard scores={scores} />
-            <GameHistory history={gameHistory} />
-          </div>
-        </div>
-      </div>
-    </div>
+    <>
+      <GlobalStyle />
+      <AppContainer>
+        <Card>
+          <HeaderComponent />
+          <Content>
+            {/* Game Section */}
+            <GameSection>
+              {renderStatusMessage(gameStatus, xIsNext)}
+              <Board
+                squares={board}
+                onClick={handleClick}
+                winningLine={winningLine}
+              />
+              <ButtonsContainer>
+                <NewGameButton onClick={resetGame}>
+                  <RefreshCw size={20} />
+                  New Game
+                </NewGameButton>
+                <ResetStatsButton onClick={resetStats}>
+                  <XCircle size={20} />
+                  Reset All
+                </ResetStatsButton>
+              </ButtonsContainer>
+            </GameSection>
+            {/* Stats Section */}
+            <StatsSection>
+              <ScoreBoard scores={scores} />
+              <GameHistory history={gameHistory} />
+            </StatsSection>
+          </Content>
+        </Card>
+      </AppContainer>
+    </>
   );
 }
 
